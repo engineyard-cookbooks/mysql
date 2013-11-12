@@ -95,24 +95,30 @@ template '/etc/mysql/my.cnf' do
   owner 'root'
   group 'root'
   mode '0644'
-  notifies :run, 'bash[move mysql data to datadir]', :immediately
   notifies :reload, 'service[mysql]'
+end
+
+template "/etc/mysql/debian.cnf" do
+  source 'debian.cnf.erb'
+  owner  'root'
+  group  node['mysql']['root_group']
+  mode   '0600'
 end
 
 # don't try this at home
 # http://ubuntuforums.org/showthread.php?t=804126
-bash 'move mysql data to datadir' do
-  user 'root'
-  code <<-EOH
-  /usr/sbin/service mysql stop &&
-  mv /var/lib/mysql/* #{node['mysql']['data_dir']} &&
-  /usr/sbin/service mysql start
-  EOH
-  action :nothing
-  only_if "[ '/var/lib/mysql' != #{node['mysql']['data_dir']} ]"
-  only_if "[ `stat -c %h #{node['mysql']['data_dir']}` -eq 2 ]"
-  not_if '[ `stat -c %h /var/lib/mysql/` -eq 2 ]'
-end
+#bash 'move mysql data to datadir' do
+  #user 'root'
+  #code <<-EOH
+  #/usr/sbin/service mysql stop &&
+  #mv /var/lib/mysql/* #{node['mysql']['data_dir']} &&
+  #/usr/sbin/service mysql start
+  #EOH
+  #action :nothing
+  #only_if "[ '/var/lib/mysql' != #{node['mysql']['data_dir']} ]"
+  #only_if "[ `stat -c %h #{node['mysql']['data_dir']}` -eq 2 ]"
+  #not_if '[ `stat -c %h /var/lib/mysql/` -eq 2 ]'
+#end
 
 service 'mysql' do
   service_name 'mysql'
