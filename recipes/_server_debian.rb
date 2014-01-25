@@ -90,19 +90,19 @@ service 'apparmor-mysql' do
   supports :reload => true
 end
 
+template "/etc/mysql/debian.cnf" do
+  source 'debian.cnf.erb'
+  owner  'root'
+  group  node['mysql']['root_group']
+  mode   '0600'
+end
+
 template '/etc/mysql/my.cnf' do
   source 'my.cnf.erb'
   owner 'root'
   group 'root'
   mode '0644'
   notifies :reload, 'service[mysql]'
-end
-
-template "/etc/mysql/debian.cnf" do
-  source 'debian.cnf.erb'
-  owner  'root'
-  group  node['mysql']['root_group']
-  mode   '0600'
 end
 
 # don't try this at home
