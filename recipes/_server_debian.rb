@@ -30,6 +30,12 @@ node['mysql']['server']['packages'].each do |name|
   end
 end
 
+service 'mysql' do
+  service_name 'mysql'
+  supports     :status => true, :restart => true, :reload => true
+  action       [:enable, :start]
+end
+
 node['mysql']['server']['directories'].each do |key, value|
   directory value do
     owner     'mysql'
@@ -119,9 +125,3 @@ end
   #only_if "[ `stat -c %h #{node['mysql']['data_dir']}` -eq 2 ]"
   #not_if '[ `stat -c %h /var/lib/mysql/` -eq 2 ]'
 #end
-
-service 'mysql' do
-  service_name 'mysql'
-  supports     :status => true, :restart => true, :reload => true
-  action       [:enable, :start]
-end
